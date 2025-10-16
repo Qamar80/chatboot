@@ -15,8 +15,13 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +29,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Signup')
-        ,centerTitle: true,
+        title: const Text('Signup'),
+        centerTitle: true,
         backgroundColor: yellowColor,
       ),
       body: SingleChildScrollView(
@@ -38,11 +43,25 @@ class _SignupScreenState extends State<SignupScreen> {
               padding: const EdgeInsets.all(16),
               child: Center(
                 child: Form(
-                  key: _formKey, // ✅ Form key for validation
+                  key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // Name Field
+                      ourTextField(
+                        title: 'Name',
+                        hint: 'Enter Name',
+                        controller: nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+
                       // Email Field
                       ourTextField(
                         title: 'Email',
@@ -61,11 +80,29 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 15),
 
                       // Password Field
-                      ourTextField(
-                        title: 'Password',
-                        hint: 'Enter Password',
+                      TextFormField(
                         controller: passwordController,
-                        isPass: true,
+                        obscureText: _obscurePassword,
+                        maxLength: 10,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Password is required';
@@ -76,7 +113,43 @@ class _SignupScreenState extends State<SignupScreen> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 15),
 
+                      // Confirm Password Field
+                      TextFormField(
+                        controller: confirmPasswordController,
+                        obscureText: _obscureConfirmPassword,
+                        maxLength: 10,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          hintText: 'Re-enter Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Confirm password is required';
+                          }
+                          if (value != passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 25),
 
                       // Signup Button
@@ -93,12 +166,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         textColor: textColor,
                         title: 'Signup',
                       ),
-
                       const SizedBox(height: 20),
+
                       const Text('OR'),
                       const SizedBox(height: 20),
 
-                      // Google Sign Up / Sign-In (optional)
                       ElevatedButton.icon(
                         onPressed: () => controller.signInWithGoogle(),
                         icon: Image.asset(
@@ -113,10 +185,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           minimumSize: const Size(double.infinity, 50),
                         ),
                       ),
-
                       const SizedBox(height: 25),
 
-                      // Login Link
                       TextButton(
                         onPressed: () => Get.toNamed('/login'),
                         child: const Text("Already have an account? Login"),
