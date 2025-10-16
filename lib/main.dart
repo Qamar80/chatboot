@@ -1,3 +1,5 @@
+
+
 import 'package:chatboot/views/home_screen.dart';
 import 'package:chatboot/views/login_screen.dart';
 import 'package:chatboot/views/signup_screen.dart';
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/signup', page: () => const SignupScreen()),
         GetPage(name: '/home', page: () => const HomeScreen()),
       ],
+
     );
   }
 }
