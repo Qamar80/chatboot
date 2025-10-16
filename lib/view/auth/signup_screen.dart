@@ -13,11 +13,13 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final controller = Get.find<AuthController>();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
+  final confirmPasswordController = TextEditingController();
 
   final RxBool isPasswordHidden = true.obs;
+  final RxBool isConfirmPasswordHidden = true.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // 👤 Name Field
+                    ourTextField(
+                      title: 'Name',
+                      hint: 'Enter Your Name',
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 15),
+
                     // ✉️ Email Field
                     ourTextField(
                       title: 'Email',
@@ -44,42 +54,86 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 15),
 
-
-                    Obx(() => TextField(
-                      controller: passwordController,
-                      obscureText: isPasswordHidden.value,
-                      maxLength: 10, // ✅ Limit password to 10 characters
-                      decoration: InputDecoration(
-                        counterText:
-                        '',
-                        labelText: 'Password',
-                        hintText: 'Enter Password (max 10 chars)',
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            isPasswordHidden.value
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey,
+                    // 🔒 Password Field
+                    Obx(
+                          () => TextField(
+                        controller: passwordController,
+                        obscureText: isPasswordHidden.value,
+                        maxLength: 10, // ✅ Limit password to 10 characters
+                        decoration: InputDecoration(
+                          counterText: '',
+                          labelText: 'Password',
+                          hintText: 'Enter Password (max 10 chars)',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              isPasswordHidden.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              isPasswordHidden.value =
+                              !isPasswordHidden.value;
+                            },
                           ),
-                          onPressed: () {
-                            isPasswordHidden.value =
-                            !isPasswordHidden.value;
-                          },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
-                    )),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    // 🔐 Confirm Password Field
+                    Obx(
+                          () => TextField(
+                        controller: confirmPasswordController,
+                        obscureText: isConfirmPasswordHidden.value,
+                        maxLength: 10,
+                        decoration: InputDecoration(
+                          counterText: '',
+                          labelText: 'Confirm Password',
+                          hintText: 'Re-enter Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              isConfirmPasswordHidden.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              isConfirmPasswordHidden.value =
+                              !isConfirmPasswordHidden.value;
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 25),
 
                     // 🔵 Signup Button
                     ourButton(
                       onPress: () {
-                        controller.signup(
-                          emailController.text.trim(),
-                          passwordController.text.trim(),
-                        );
+                        if (passwordController.text.trim() !=
+                            confirmPasswordController.text.trim()) {
+                          Get.snackbar(
+                            'Error',
+                            'Passwords do not match',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                        } else {
+                          controller.signup(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+                        }
                       },
                       color: Colors.blue,
                       textColor: Colors.white,
