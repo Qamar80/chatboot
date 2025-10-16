@@ -1,3 +1,4 @@
+import 'package:chatboot/constants/colors.dart';
 import 'package:chatboot/widgets/our_button.dart';
 import 'package:chatboot/widgets/our_textField.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,8 @@ class LoginScreen extends StatelessWidget {
     final passwordController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Login Screen'),
+      backgroundColor: yellowColor,),
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -30,16 +32,24 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+
+
                     ourTextField(
                         title: 'Email',
                         hint: 'Enter Email',
-                        controller: emailController),
+                        controller: emailController
+                    ),
+
                     const SizedBox(height: 10),
+
                     ourTextField(
                         title: 'Password',
                         hint: 'Enter Password',
-                        controller: passwordController),
+                        controller: passwordController
+                    ),
+
                     const SizedBox(height: 20),
+
                     ourButton(
                       onPress: () {
                         controller.login(
@@ -47,13 +57,14 @@ class LoginScreen extends StatelessWidget {
                           passwordController.text.trim(),
                         );
                       },
-                      color: Colors.blue,
-                      textColor: Colors.white,
+                      color: yellowColor,
+                      textColor: textColor,
                       title: 'Login',
                     ),
                     const SizedBox(height: 20),
                     const Text('OR'),
                     const SizedBox(height: 20),
+
                     ElevatedButton.icon(
                       onPressed: () => controller.signInWithGoogle(),
                       icon: const Icon(Icons.login),
