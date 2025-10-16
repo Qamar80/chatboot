@@ -4,8 +4,11 @@ import 'package:chatboot/view/auth/login_screen.dart';
 import 'package:chatboot/view/auth/signup_screen.dart';
 import 'package:chatboot/view/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get_core/src/get_main.dart' show Get;
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart' show GetMaterialApp;
+import 'package:get/get_navigation/src/routes/get_route.dart' show GetPage;
 import 'controllers/auth_controller.dart';
 
 import 'firebase_options.dart';
