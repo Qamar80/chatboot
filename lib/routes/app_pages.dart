@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 
-import '../views/home_screen.dart';
-import '../views/login_screen.dart';
-import '../views/signup_screen.dart';
+import '../view/auth/login_screen.dart';
+import '../view/auth/signup_screen.dart';
+import '../view/chat/home_screen.dart';
+
+
 
 
 class AppRoutes {

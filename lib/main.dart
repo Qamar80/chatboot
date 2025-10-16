@@ -1,8 +1,8 @@
 
 
-import 'package:chatboot/views/home_screen.dart';
-import 'package:chatboot/views/login_screen.dart';
-import 'package:chatboot/views/signup_screen.dart';
+import 'package:chatboot/view/auth/login_screen.dart';
+import 'package:chatboot/view/auth/signup_screen.dart';
+import 'package:chatboot/view/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/signup', page: () => const SignupScreen()),
-        GetPage(name: '/home', page: () => const HomeScreen()),
+        GetPage(name: '/home', page: () => const ChatScreen()),
       ],
 
     );
