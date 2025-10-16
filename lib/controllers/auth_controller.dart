@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,19 +46,41 @@ class AuthController extends GetxController {
     }
   }
 
+  // Add user to Firestore
+  Future<void> _addUserToFirestore(User user) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    final doc = await userRef.get();
+    if (!doc.exists) {
+      await userRef.set({
+        'uid': user.uid,
+        'email': user.email,
+        'name': user.displayName ?? '',
+        'photoUrl': user.photoURL ?? '',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+
   // Signup with Email/Password
   Future<void> signup(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // 🔹 Add user to Firestore
+      await _addUserToFirestore(userCredential.user!);
+
       Get.snackbar('Success', 'Signup successful');
       Get.offAllNamed('/login');
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
   }
+
 
   // Login with Email/Password
   Future<void> login(String email, String password) async {
