@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+
+import '../../controllers/auth_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -8,6 +12,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+
   final TextEditingController _messageController = TextEditingController();
 
   // Dummy messages for UI preview
@@ -19,10 +24,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AuthController>();
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
+        actions: [
+          IconButton(onPressed: (){
+            controller.logout();
+          }, icon: Icon(Icons.logout))
+        ],
         title: const Text(
           "Chatbot",
           style: TextStyle(fontWeight: FontWeight.bold),

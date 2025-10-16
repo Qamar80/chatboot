@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 
 Widget ourTextField({
-  String? title,
-  String? hint,
+  required String title,
+  required String hint,
+  required TextEditingController controller,
   bool isPass = false,
-  controller,
-  int maxLength = 25, // Limit to few words (default 20 chars)
+  int maxLength = 25,
+  String? Function(String?)? validator, //  validation function
 }) {
-  return TextField(
+  return TextFormField(
     obscureText: isPass,
     controller: controller,
-    maxLength: maxLength, //  Limit characters
-    maxLines: 1,          // Single line
+    maxLength: maxLength,
+    maxLines: 1,
     decoration: InputDecoration(
       labelText: title,
       hintText: hint,
-      counterText: "", //  Hide default counter text
+      counterText: "",
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
       ),
     ),
+    validator: validator, //  Apply validator
   );
 }
