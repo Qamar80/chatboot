@@ -17,7 +17,7 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
-  // 🔹 Navigate to Home or Login automatically
+  //  Navigate to Home or Login automatically
   _setInitialScreen(User? user) {
     if (user == null) {
       Get.offAllNamed('/login');
@@ -26,7 +26,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // 🔹 Signup with Email/Password
+  //  Signup with Email/Password
   Future<void> signup(String email, String password) async {
     try {
       await _auth.createUserWithEmailAndPassword(
@@ -40,7 +40,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // 🔹 Login with Email/Password
+  //  Login with Email/Password
   Future<void> login(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(
@@ -54,42 +54,56 @@ class AuthController extends GetxController {
     }
   }
 
-// Google Sign-In
+
+
+
   Future<void> signInWithGoogle() async {
     try {
-      print(" Starting Google Sign-In...");
+      print("🔹 Starting Google Sign-In...");
+      await _googleSignIn.signOut(); // Always show account picker
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         print(" Google Sign-In canceled by user");
         return;
       }
 
-      print(" Google user selected: ${googleUser.email}");
+      print("selected Google user: ${googleUser.email}");
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      print(" Got Google Auth Tokens");
+      // Check if the email already exists in Firebase
+      final signInMethods =
+      await _auth.fetchSignInMethodsForEmail(googleUser.email);
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      print("🧩 Signing in to Firebase with Google credential...");
-      await _auth.signInWithCredential(credential);
+      if (signInMethods.isEmpty) {
+        // New user → register (sign up)
+        print("Registering new Google user...");
+        await _auth.signInWithCredential(credential);
+        Get.snackbar('Account Created', 'Welcome, ${googleUser.displayName}!');
+      } else {
+        // Existing user → login
+        print(" Logging in existing user...");
+        await _auth.signInWithCredential(credential);
+        Get.snackbar('Success', 'Welcome back, ${googleUser.displayName}!');
+      }
 
-      print("🎉 Google Sign-In successful!");
-      Get.snackbar('Success', 'Signed in with Google');
+      print(" Google Sign-In successful!");
       Get.offAllNamed('/home');
     } catch (e, stack) {
-      print("❌ Google Sign-In Error: $e");
-      print("🧾 Stack Trace: $stack");
+      print("Google Sign-In Error: $e");
+
       Get.snackbar('Google Sign-In Error', e.toString());
     }
   }
 
 
-  // 🔹 Logout
+  //  Logout
   Future<void> logout() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
