@@ -3,22 +3,28 @@ import 'package:chatboot/widgets/our_button.dart';
 import 'package:chatboot/widgets/our_textField.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/auth_controller.dart';
 
-
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<AuthController>();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final controller = Get.find<AuthController>();
+  bool _obscurePassword = true; // For hiding/showing password
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login Screen'),
-      backgroundColor: yellowColor,),
+      appBar: AppBar(
+        title: const Text('Login Screen'),
+        backgroundColor: yellowColor,
+      ),
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -32,24 +38,41 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-
-
                     ourTextField(
-                        title: 'Email',
-                        hint: 'Enter Email',
-                        controller: emailController
+                      title: 'Email',
+                      hint: 'Enter Email',
+                      controller: emailController,
                     ),
-
                     const SizedBox(height: 10),
 
-                    ourTextField(
-                        title: 'Password',
-                        hint: 'Enter Password',
-                        controller: passwordController
+                    // Password Field with eye icon + limit
+                    TextField(
+                      controller: passwordController,
+                      obscureText: _obscurePassword,
+                      maxLength: 10, // ✅ Limit to 10 characters
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        hintText: 'Enter Password',
+                        counterText: "", // hides character counter
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 20),
-
                     ourButton(
                       onPress: () {
                         controller.login(
