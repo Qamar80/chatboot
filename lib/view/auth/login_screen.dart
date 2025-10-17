@@ -73,6 +73,8 @@ class LoginScreen extends StatelessWidget {
                             emailController.text.trim(),
                             passwordController.text.trim(),
                           );
+                          //api
+                          controller.login(emailController.text, passwordController.text);
 
                         }
 

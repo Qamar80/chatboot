@@ -5,17 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../data/models/api_user_model.dart';
+import '../repositories/auth_repository.dart';
+
 
 class AuthController extends GetxController {
   var isPasswordVisible = false.obs;
   var isConfirmPasswordHidden = true.obs;
 
+  var isLoading = false.obs;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Reactive Firebase User
   var firebaseUser = Rxn<User>();
+
+  // API Repository (Medical Chatbot API)
+  late final AuthRepository authRepository;
 
   @override
   void onInit() {
@@ -126,4 +135,69 @@ class AuthController extends GetxController {
     await _googleSignIn.signOut();
     Get.off(LoginScreen());
   }
+
+
+
+
+
+
+
+
+
+
+
+  // =========================
+  // Medical Chatbot API Signup
+  // =========================
+  Future<void> signupApi(String name,String email, String password) async {
+    try {
+      isLoading.value = true;
+      ApiUserModel newUser = await authRepository.register(name,email, password);
+
+      // Save token locally
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', newUser.token);
+
+      Get.snackbar('Success', 'API Signup successful');
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+  // Medical Chatbot API Login
+
+  Future<void> loginApi(String email, String password) async {
+    try {
+      isLoading.value = true;
+      ApiUserModel loggedUser = await authRepository.login(email, password);
+
+      // Save token locally
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', loggedUser.token);
+
+      Get.offAll(ChatScreen());
+      Get.snackbar('Success', 'API Login successful');
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+  // Get saved token
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
+
+
+
+
+
 }

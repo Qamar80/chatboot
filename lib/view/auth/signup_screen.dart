@@ -110,6 +110,9 @@ class SignupScreen extends StatelessWidget {
                           emailController.text.trim(),
                           passwordController.text.trim()
                         );
+
+                        //api
+                        controller.signupApi(nameController.text,emailController.text, passwordController.text);
                       }
                     },
                     color: yellowColor,

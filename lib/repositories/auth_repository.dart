@@ -1,49 +1,29 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import '../data/models/user_model.dart';
+
+
+import 'package:chatboot/data/models/api_user_model.dart';
+
+import '../data/network/api_client.dart';
+
 
 class AuthRepository {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final ApiClient apiClient;
 
-  // 🔹 Email Signup
-  Future<User?> registerWithEmail(String email, String password) async {
-    final credential = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return credential.user;
+  AuthRepository({required this.apiClient});
+
+  Future<ApiUserModel> login(String email, String password) async {
+    final response = await apiClient.post('/api/auth/login', {
+      'email': email,
+      'password': password,
+    });
+    return ApiUserModel.fromJson(response['data']);
   }
 
-  // 🔹 Email Login
-  Future<User?> loginWithEmail(String email, String password) async {
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return credential.user;
-  }
-
-  // 🔹 Google Sign-In
-  Future<User?> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) return null;
-
-    final GoogleSignInAuthentication googleAuth =
-    await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
-      accessToken: googleAuth.accessToken,
-    );
-
-    final userCredential = await _auth.signInWithCredential(credential);
-    return userCredential.user;
-  }
-
-  // 🔹 Sign Out
-  Future<void> signOut() async {
-    await _auth.signOut();
-    await _googleSignIn.signOut();
+  Future<ApiUserModel> register(String name,String email, String password) async {
+    final response = await apiClient.post('/api/auth/register', {
+      'name': name,
+      'email': email,
+      'password': password,
+    });
+    return ApiUserModel.fromJson(response['data']);
   }
 }
