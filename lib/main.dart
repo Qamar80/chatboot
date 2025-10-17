@@ -3,6 +3,7 @@
 import 'package:chatboot/view/auth/login_screen.dart';
 import 'package:chatboot/view/auth/signup_screen.dart';
 import 'package:chatboot/view/chat/chat_screen.dart';
+import 'package:chatboot/view/on_boarding/on_boarding_Screen.dart' show OnboardingScreen;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get_core/src/get_main.dart' show Get;
@@ -28,11 +29,13 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ChatBoot',
-      initialRoute: '/login',
+      initialRoute: '/onboarding',
       getPages: [
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/signup', page: () => const SignupScreen()),
         GetPage(name: '/home', page: () => const ChatScreen()),
+        GetPage(name: '/onboarding', page: () => const OnboardingScreen()),
+
       ],
 
     );
