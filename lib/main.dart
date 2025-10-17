@@ -1,41 +1,55 @@
-
-import 'package:chatboot/view/auth/Intro_screen.dart';
+import 'package:chatboot/controllers/auth_controller.dart';
 import 'package:chatboot/view/auth/login_screen.dart';
-import 'package:chatboot/view/auth/signup_screen.dart';
 import 'package:chatboot/view/chat/chat_screen.dart';
-import 'package:chatboot/view/on_boarding/on_boarding_Screen.dart' show OnboardingScreen;
+import 'package:chatboot/view/on_boarding/on_boarding_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:get/get_core/src/get_main.dart' show Get;
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart' show GetMaterialApp;
-import 'package:get/get_navigation/src/routes/get_route.dart' show GetPage;
-import 'controllers/auth_controller.dart';
-
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  Get.put(AuthController()); // Initialize controller
-  runApp(const MyApp());
+
+  // Initialize AuthController
+  Get.put(AuthController());
+
+  // Check first launch and current user
+  final prefs = await SharedPreferences.getInstance();
+  final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+  final user = Get.find<AuthController>().firebaseUser.value;
+
+  Widget initialScreen;
+
+  if (user != null) {
+    // Already logged in
+    initialScreen = const ChatScreen();
+  } else if (isFirstLaunch) {
+    // First install → Onboarding
+    initialScreen = const OnboardingScreen();
+  } else {
+    // Not first install, not logged in → Login
+    initialScreen = LoginScreen();
+  }
+
+  runApp(MyApp(initialScreen: initialScreen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ChatBoot',
-      home: IntroScreen(),
+      home: initialScreen,
       getPages: [
         GetPage(name: '/login', page: () => LoginScreen()),
-        GetPage(name: '/signup', page: () => SignupScreen()),
-        GetPage(name: '/home', page: () => const ChatScreen()),
+        GetPage(name: '/chat', page: () => const ChatScreen()),
         GetPage(name: '/onboarding', page: () => const OnboardingScreen()),
-        GetPage(name: '/intro', page: () => const IntroScreen()),
       ],
     );
   }
