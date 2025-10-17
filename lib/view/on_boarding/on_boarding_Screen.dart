@@ -1,6 +1,7 @@
 import 'package:chatboot/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/our_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -24,26 +25,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "icon": "🔥",
       "title": "Limit Distractions",
-      "desc":
-      "Set app time limits and regain control of your screen time."
+      "desc": "Set app time limits and regain control of your screen time."
     },
     {
       "icon": "🔥",
       "title": "Routine Built For You",
-      "desc":
-      "Powered by AI, your schedule adapts to your lifestyle and life goals."
+      "desc": "Powered by AI, your schedule adapts to your lifestyle and life goals."
     },
   ];
 
-  void _nextPage() {
+  // Save that onboarding is done
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstLaunch', false);
+  }
+
+  void _nextPage() async {
     if (_currentPage < onboardingData.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
     } else {
+      await _completeOnboarding();
       Get.offAllNamed('/login'); // go to login screen on last
     }
+  }
+
+  void _skip() async {
+    await _completeOnboarding();
+    Get.offAllNamed('/login');
   }
 
   @override
@@ -59,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Align(
                 alignment: Alignment.topRight,
                 child: TextButton(
-                  onPressed: () => Get.offAllNamed('/login'),
+                  onPressed: _skip,
                   child: const Text(
                     "Skip",
                     style: TextStyle(color: textColor, fontSize: 16),
@@ -85,19 +96,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
                         CircleAvatar(
                           radius: 45,
                           backgroundColor: yellowColor,
                           child: Text(
                             item["icon"]!,
                             style: const TextStyle(
-                                fontSize: 40, color: textColor),
+                              fontSize: 40,
+                              color: textColor,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 40),
-
-                        // Title
                         Text(
                           item["title"]!,
                           style: const TextStyle(
@@ -108,8 +118,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 10),
-
-                        // Description
                         Text(
                           item["desc"]!,
                           style: const TextStyle(
@@ -136,9 +144,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 6,
                   width: _currentPage == index ? 20 : 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? yellowColor
-                        : whiteColor,
+                    color: _currentPage == index ? yellowColor : whiteColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),

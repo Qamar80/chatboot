@@ -1,9 +1,11 @@
+import 'package:chatboot/%20Routes/RoutesName.dart';
 import 'package:chatboot/view/auth/signup_screen.dart';
 import 'package:chatboot/widgets/our_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/colors.dart';
 import 'login_screen.dart';
+
 
 class IntroScreen extends StatelessWidget {
   const IntroScreen({super.key});
@@ -95,6 +97,7 @@ class IntroScreen extends StatelessWidget {
 
                 ourButton(
                     onPress: (){
+                    //  RoutesName.loginView;
                       Get.to(() =>  LoginScreen());
                     },
                     color: yellowColor,
