@@ -1,5 +1,6 @@
 
 
+import 'package:chatboot/view/auth/Intro_screen.dart';
 import 'package:chatboot/view/auth/login_screen.dart';
 import 'package:chatboot/view/auth/signup_screen.dart';
 import 'package:chatboot/view/chat/chat_screen.dart';
@@ -16,8 +17,15 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  Get.put(AuthController()); // 🔹 Initialize controller
+  Get.put(AuthController()); //  Initialize controller
+
+
+  //Get.put(AuthController());
   runApp(const MyApp());
+
+
+
+
 }
 
 class MyApp extends StatelessWidget {
@@ -27,13 +35,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'ChatBoot',
+    home: IntroScreen(),
+    /*  title: 'ChatBoot',
       initialRoute: '/login',
       getPages: [
-        GetPage(name: '/login', page: () => const LoginScreen()),
+       *//* GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/signup', page: () => const SignupScreen()),
-        GetPage(name: '/home', page: () => const ChatScreen()),
-      ],
+        GetPage(name: '/home', page: () => const ChatScreen()),*//*
+        GetPage(name: '/into', page: () => const IntroScreen()),
+      ],*/
 
     );
   }

@@ -1,5 +1,5 @@
-import 'dart:ui';
-
+import 'package:chatboot/view/auth/login_screen.dart';
+import 'package:chatboot/view/chat/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthController extends GetxController {
+  var isPasswordVisible = false.obs;
+  var isConfirmPasswordHidden = true.obs;
+
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -21,7 +25,7 @@ class AuthController extends GetxController {
     });
 
     firebaseUser.bindStream(_auth.authStateChanges());
-    ever(firebaseUser, _setInitialScreen);
+   // ever(firebaseUser, _setInitialScreen);
     super.onInit();
   }
 
@@ -33,53 +37,47 @@ class AuthController extends GetxController {
     }
   }
 
-  // Navigate to Home or Login automatically
-  _setInitialScreen(User? user) {
-    if (user == null) {
-      if (Get.currentRoute != '/login') {
-        Get.offAllNamed('/login');
-      }
-    } else {
-      if (Get.currentRoute != '/home') {
-        Get.offAllNamed('/home');
-      }
-    }
-  }
+
+
 
   // Add user to Firestore
-  Future<void> _addUserToFirestore(User user) async {
+  // Add user to Firestore
+  Future<void> _addUserToFirestore(User user, String name) async {
     final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-
     final doc = await userRef.get();
     if (!doc.exists) {
       await userRef.set({
         'uid': user.uid,
         'email': user.email,
-        'name': user.displayName ?? '',
-        'photoUrl': user.photoURL ?? '',
+        'name': name, // <-- use the name from signup screen directly
         'createdAt': FieldValue.serverTimestamp(),
       });
     }
   }
 
 
+
   // Signup with Email/Password
-  Future<void> signup(String email, String password) async {
+  Future<void> signup(String name, String email, String password) async {
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 🔹 Add user to Firestore
-      await _addUserToFirestore(userCredential.user!);
+      // Set display name (optional)
+      await userCredential.user!.updateDisplayName(name);
+      await userCredential.user!.reload(); // optional
+
+      // Pass name directly to Firestore
+      await _addUserToFirestore(userCredential.user!, name);
 
       Get.snackbar('Success', 'Signup successful');
-      Get.offAllNamed('/login');
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
   }
+
 
 
   // Login with Email/Password
@@ -90,7 +88,7 @@ class AuthController extends GetxController {
         password: password,
       );
       Get.snackbar('Success', 'Login successful');
-      Get.offAllNamed('/home');
+      Get.to(ChatScreen());
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
@@ -101,27 +99,22 @@ class AuthController extends GetxController {
     try {
       // Ensure previous Google session is signed out so picker shows
       await _googleSignIn.signOut();
-
       // Trigger the Google Sign-In flow (forces account selection)
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         Get.snackbar('Cancelled', 'Google sign-in cancelled');
         return;
       }
-
       // Obtain auth details
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
       // Create credential and sign in with Firebase
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
       await _auth.signInWithCredential(credential);
-
       Get.snackbar('Success', 'Logged in with Google');
-      Get.offAllNamed('/home');
+     // Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
@@ -131,6 +124,6 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
-    Get.offAllNamed('/login');
+    Get.off(LoginScreen());
   }
 }

@@ -18,7 +18,7 @@ class AuthController extends GetxController {
     required String name,
     required String email,
     required String password,
-    required String confirmPassword,
+    //required String confirmPassword,
   }) async {
     try {
       isLoading.value = true;
@@ -30,7 +30,7 @@ class AuthController extends GetxController {
           "name": name,
           "email": email,
           "password": password,
-          "confirmPassword": confirmPassword,
+          //"confirmPassword": confirmPassword,
         }),
       );
 
